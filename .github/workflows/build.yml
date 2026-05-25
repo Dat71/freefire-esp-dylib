@@ -9,6 +9,7 @@ jobs:
       - name: Compile
         run: |
           clang -arch arm64 -dynamiclib \
+            -isysroot $(xcrun --sdk iphoneos --show-sdk-path) \
             -framework UIKit \
             -framework Foundation \
             -framework QuartzCore \
