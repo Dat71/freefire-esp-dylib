@@ -1,26 +1,36 @@
-name: Build FreeFire Menu Dylib
-on: workflow_dispatch
+name: Build BattleCats Pro Menu
+
+# Tự động chạy khi bạn tải code mới lên hoặc bấm nút chạy bằng tay
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch: 
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: macos-latest # Sử dụng máy chủ macOS của GitHub
+
     steps:
-      - uses: actions/checkout@v4
-      - name: Compile
-        run: |
-          SDK_PATH=$(xcrun --sdk iphoneos --show-sdk-path)
-          clang -arch arm64 -dynamiclib \
-            -isysroot "$SDK_PATH" \
-            -framework UIKit \
-            -framework Foundation \
-            -framework QuartzCore \
-            -framework CoreGraphics \
-            -mios-version-min=13.0 \
-            -O2 \
-            -o FreeFireMenu.dylib \
-            FreeFireMenu.m
-      - name: Upload
-        uses: actions/upload-artifact@v4
-        with:
-          name: FreeFireMenu
-          path: FreeFireMenu.dylib
+    - name: Tải mã nguồn về máy ảo
+      uses: actions/checkout@v4
+
+    - name: Thiết lập môi trường iOS SDK
+      run: |
+        sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+        xcrun --sdk iphoneos --show-sdk-path
+
+    - name: Biên dịch file .m sang .dylib
+      run: |
+        xcrun -sdk iphoneos clang -dynamiclib -arch arm64 \
+        -isysroot $(xcrun --sdk iphoneos --show-sdk-path) \
+        -miphoneos-version-min=14.0 \
+        -framework UIKit \
+        -framework Foundation \
+        -framework QuartzCore \
+        BattleCats_ProMenu.m -o BattleCats_ProMenu.dylib
+
+    - name: Xuất file thành phẩm (Artifact) để tải về
+      uses: actions/upload-artifact@v4
+      with:
+        name: BattleCats-ProMenu-Dylib
+        path: BattleCats_ProMenu.dylib
