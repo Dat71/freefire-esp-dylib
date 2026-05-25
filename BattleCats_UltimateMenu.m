@@ -97,9 +97,10 @@ int new_getCatFood(void *instance) {
     });
 }
 
-// SỬA LỖI ĐƠ MENU: Di chuyển toàn bộ UIWindow theo tay người dùng
+// SỬA LỖI ĐƠ MENU VÀ LỖI CẢNH BÁO KEYWINDOW
 - (void)handleMenuDrag:(UIPanGestureRecognizer *)gesture {
-    CGPoint touchPoint = [gesture locationInView:[[UIApplication sharedApplication] keyWindow]];
+    // nil thay thế cho keyWindow để lấy tọa độ trực tiếp toàn màn hình (Fix warning)
+    CGPoint touchPoint = [gesture locationInView:nil]; 
     
     if (gesture.state == UIGestureRecognizerStateChanged) {
         self->menuWindow.center = touchPoint; // Di chuyển vùng thấu kính Window theo tay
@@ -195,6 +196,7 @@ int new_getCatFood(void *instance) {
     [rootVC.view addSubview:close];
 }
 
+// ĐÃ SỬA LỖI BIẾN `ACTION` TẠI ĐÂY
 - (void)createRow:(NSString *)text yPos:(CGFloat)y view:(UIView *)pView action:(SEL)sel {
     UIView *rowBg = [[UIView alloc] initWithFrame:CGRectMake(15, y, 270, 44)];
     rowBg.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.08];
@@ -209,7 +211,8 @@ int new_getCatFood(void *instance) {
     
     UISwitch *toggle = [[UISwitch alloc] initWithFrame:CGRectMake(210, 6, 50, 31)];
     toggle.onTintColor = [UIColor colorWithRed:0.0 green:0.9 blue:0.9 alpha:1.0];
-    [toggle addTarget:self action:action forControlEvents:UIControlEventValueChanged];
+    // Thay đổi chữ 'action' thành biến 'sel' truyền vào
+    [toggle addTarget:self action:sel forControlEvents:UIControlEventValueChanged];
     [rowBg addSubview:toggle];
 }
 
