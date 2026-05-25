@@ -1,4 +1,4 @@
-name: Build iOS Dylib
+name: Build FreeFire Menu Dylib
 on: workflow_dispatch
 
 jobs:
@@ -6,18 +6,18 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Compile dylib
+      - name: Compile
         run: |
           clang -arch arm64 -dynamiclib \
             -framework UIKit \
             -framework Foundation \
+            -framework QuartzCore \
             -mios-version-min=13.0 \
-            -isysroot $(xcrun --sdk iphoneos --show-sdk-path) \
             -O2 \
-            -o ff_esp.dylib \
-            ff_esp.m
+            -o FreeFireMenu.dylib \
+            FreeFireMenu.m
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: ff_esp
-          path: ff_esp.dylib
+          name: FreeFireMenu
+          path: FreeFireMenu.dylib
