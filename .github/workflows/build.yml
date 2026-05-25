@@ -1,5 +1,6 @@
-name: Build BattleCats Pro Menu
+name: Build BattleCats Ultimate Menu
 
+# Tự động chạy khi bạn tải code mới lên hoặc bấm nút chạy bằng tay
 on:
   push:
     branches: [ "main" ]
@@ -7,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: macos-latest # Sử dụng máy chủ macOS của GitHub
 
     steps:
     - name: Tải mã nguồn về máy ảo
@@ -27,10 +28,10 @@ jobs:
         -framework Foundation \
         -framework QuartzCore \
         -framework CoreGraphics \
-        BattleCats_ProMenu.m -o BattleCats_ProMenu.dylib
+        BattleCats_UltimateMenu.m -o BattleCats_UltimateMenu.dylib
 
     - name: Xuất file thành phẩm (Artifact) để tải về
       uses: actions/upload-artifact@v4
       with:
-        name: BattleCats-ProMenu-Dylib
-        path: BattleCats_ProMenu.dylib
+        name: BattleCats-UltimateMenu-Dylib
+        path: BattleCats_UltimateMenu.dylib
