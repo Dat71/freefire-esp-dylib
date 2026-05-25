@@ -1,0 +1,64 @@
+name: Build FreeFire ESP Dylib
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Create ff_esp.m
+        run: |
+          cat > ff_esp.m << 'EOF'
+          #import <UIKit/UIKit.h>
+          #import <Foundation/Foundation.h>
+          
+          @interface FreeFireESP : NSObject
+          @end
+          
+          @implementation FreeFireESP
+          
+          + (void)load {
+              dispatch_async(dispatch_get_main_queue(), ^{
+                  NSLog(@"[FREE FIRE ESP] Da khoi dong!");
+                  UIAlertController *alert = [UIAlertController 
+                      alertControllerWithTitle:@"FREE FIRE ESP" 
+                      message:@"ESP da duoc kich hoat!" 
+                      preferredStyle:UIAlertControllerStyleAlert];
+                  UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+                  window.windowLevel = UIWindowLevelAlert + 100;
+                  window.hidden = NO;
+                  [window.rootViewController presentViewController:alert animated:YES completion:nil];
+              });
+          }
+          
+          @end
+          
+          __attribute__((constructor))
+          static void init() {
+              dispatch_async(dispatch_get_main_queue(), ^{
+                  [FreeFireESP new];
+              });
+          }
+          EOF
+      
+      - name: Compile dylib
+        run: |
+          clang -arch arm64 -dynamiclib \
+            -framework UIKit \
+            -framework Foundation \
+            -mios-version-min=13.0 \
+            -O2 \
+            -o ff_esp.dylib \
+            ff_esp.m
+          echo "Compile completed!"
+          ls -la ff_esp.dylib
+          
+      - name: Upload dylib
+        uses: actions/upload-artifact@v3
+        with:
+          name: freefire-esp-dylib
+          path: ff_esp.dylib
