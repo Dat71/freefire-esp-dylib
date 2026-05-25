@@ -1,4 +1,5 @@
 name: Build FreeFire ESP Dylib
+
 on:
   push:
     branches: [ main ]
@@ -6,58 +7,32 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
-      
-      - name: Create ff_esp.m
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Download iOS SDK 14.5
         run: |
-          cat > ff_esp.m << 'EOF'
-          #import <UIKit/UIKit.h>
-          #import <Foundation/Foundation.h>
-          
-          @interface FreeFireESP : NSObject
-          @end
-          
-          @implementation FreeFireESP
-          
-          + (void)load {
-              dispatch_async(dispatch_get_main_queue(), ^{
-                  NSLog(@"[FREE FIRE ESP] Da khoi dong!");
-                  UIAlertController *alert = [UIAlertController 
-                      alertControllerWithTitle:@"FREE FIRE ESP" 
-                      message:@"ESP da duoc kich hoat!" 
-                      preferredStyle:UIAlertControllerStyleAlert];
-                  UIWindow *window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
-                  window.windowLevel = UIWindowLevelAlert + 100;
-                  window.hidden = NO;
-                  [window.rootViewController presentViewController:alert animated:YES completion:nil];
-              });
-          }
-          
-          @end
-          
-          __attribute__((constructor))
-          static void init() {
-              dispatch_async(dispatch_get_main_queue(), ^{
-                  [FreeFireESP new];
-              });
-          }
-          EOF
-      
-      - name: Compile dylib
+          mkdir -p sdks
+          curl -L -o iphoneos.tar.gz https://github.com/theos/sdks/raw/master/iPhoneOS14.5.sdk.tar.xz
+          tar -xf iphoneos.tar.gz -C sdks/
+          mv sdks/iPhoneOS14.5.sdk.tar.xz/* sdks/ 2>/dev/null || true
+
+      - name: Compile dylib with Clang
         run: |
-          clang -arch arm64 -dynamiclib \
-            -framework UIKit \
-            -framework Foundation \
-            -mios-version-min=13.0 \
-            -O2 \
-            -o ff_esp.dylib \
-            ff_esp.m
-          echo "Compile completed!"
-          ls -la ff_esp.dylib
-          
-      - name: Upload dylib
+          clang -target arm64-apple-ios13.0 \
+          -fuse-ld=lld \
+          -isysroot ./sdks/iPhoneOS14.5.sdk \
+          -dynamiclib \
+          -framework UIKit \
+          -framework Foundation \
+          -framework QuartzCore \
+          -O2 \
+          -o ff_esp.dylib ff_esp.m
+
+      - name: Upload compiled dylib artifact
         uses: actions/upload-artifact@v4
         with:
           name: freefire-esp-dylib
