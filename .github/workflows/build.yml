@@ -12,6 +12,7 @@ jobs:
             -framework UIKit \
             -framework Foundation \
             -mios-version-min=13.0 \
+            -isysroot $(xcrun --sdk iphoneos --show-sdk-path) \
             -O2 \
             -o ff_esp.dylib \
             ff_esp.m
