@@ -9,10 +9,10 @@ jobs:
       - name: Compile
         run: |
           clang -arch arm64 -dynamiclib \
-            -isysroot $(xcrun --sdk iphoneos --show-sdk-path) \
             -framework UIKit \
             -framework Foundation \
             -framework QuartzCore \
+            -framework CoreGraphics \
             -mios-version-min=13.0 \
             -O2 \
             -o FreeFireMenu.dylib \
