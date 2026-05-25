@@ -58,7 +58,7 @@ jobs:
           ls -la ff_esp.dylib
           
       - name: Upload dylib
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: freefire-esp-dylib
           path: ff_esp.dylib
