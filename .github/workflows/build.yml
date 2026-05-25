@@ -1,39 +1,22 @@
-name: Build FreeFire ESP Dylib
-
-on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:
+name: Build iOS Dylib
+on: workflow_dispatch
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-
+    runs-on: macos-latest
     steps:
-      - name: Check out repository code
-        uses: actions/checkout@v4
-
-      - name: Download iOS SDK 14.5
+      - uses: actions/checkout@v4
+      - name: Compile dylib
         run: |
-          mkdir -p sdks
-          curl -L -o iphoneos.tar.gz https://github.com/theos/sdks/raw/master/iPhoneOS14.5.sdk.tar.xz
-          tar -xf iphoneos.tar.gz -C sdks/
-          mv sdks/iPhoneOS14.5.sdk.tar.xz/* sdks/ 2>/dev/null || true
-
-      - name: Compile dylib with Clang
-        run: |
-          clang -target arm64-apple-ios13.0 \
-          -fuse-ld=lld \
-          -isysroot ./sdks/iPhoneOS14.5.sdk \
-          -dynamiclib \
-          -framework UIKit \
-          -framework Foundation \
-          -framework QuartzCore \
-          -O2 \
-          -o ff_esp.dylib ff_esp.m
-
-      - name: Upload compiled dylib artifact
+          clang -arch arm64 -dynamiclib \
+            -framework UIKit \
+            -framework Foundation \
+            -mios-version-min=13.0 \
+            -O2 \
+            -o ff_esp.dylib \
+            ff_esp.m
+      - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: freefire-esp-dylib
+          name: ff_esp
           path: ff_esp.dylib
